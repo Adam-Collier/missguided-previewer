@@ -1,0 +1,28 @@
+.amplience {
+  padding: 0.5rem 0.5rem 0.5rem;
+  display: flex;
+}
+
+.amplience > * {
+  flex: 1;
+}
+
+.amplience input {
+  border: 0;
+  border-radius: 3px 0 0 3px;
+  background-color: white;
+  min-width: calc(100% - 181px);
+  padding: 0.5rem;
+}
+
+.amplience button {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid white;
+  padding: 0.5rem;
+  border-radius: 0 3px 3px 0;
+}
+
+.amplience button:hover {
+  background: hsl(216, 13.2%, 20%);
+}

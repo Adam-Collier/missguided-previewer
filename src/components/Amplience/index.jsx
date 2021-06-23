@@ -1,6 +1,8 @@
 import {useState} from "react"
 import { inlineContent } from 'cms-javascript-sdk';
 
+import s from "./amplience.module.css"
+
 const Amplience = ({isSDK, sdk, data, layout, setData, setLayout}) => {
     const [amplienceId, setAmplienceId] = useState('');
 
@@ -35,9 +37,9 @@ const Amplience = ({isSDK, sdk, data, layout, setData, setLayout}) => {
     };
     
     return (
-      <div className="amplience">
+      <div className={s.amplience}>
         {!isSDK && (
-          <div>
+          <>
             <input
               type="text"
               placeholder="Amplience content ID"
@@ -45,7 +47,7 @@ const Amplience = ({isSDK, sdk, data, layout, setData, setLayout}) => {
               onChange={onAmplienceIdChange}
             />
             <button onClick={getAmplienceData}>Get amplience data</button>
-          </div>
+          </>
         )}
         {isSDK && (
           <button onClick={saveToAmplience}>save Changes to Amplience</button>
