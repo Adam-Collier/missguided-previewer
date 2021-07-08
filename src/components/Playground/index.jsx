@@ -149,7 +149,10 @@ const Playground = ({ live }) => {
     setAdvancedMode(value);
   };
 
-  console.log(json);
+
+  console.log(missguidedComponents, "missguided components");
+  console.log(creativeComponents["Text"].propTypes);
+
 
   if (live) {
     return (
@@ -178,7 +181,7 @@ const Playground = ({ live }) => {
                 setMDX={setMDX}
               />
             </Section>
-            <Section>
+            {/* <Section>
               <ToggleButtonGroup
                 type="radio"
                 value={advancedMode}
@@ -197,15 +200,15 @@ const Playground = ({ live }) => {
             {advancedMode ? (
               <ComponentForm
                 valueUpdate={valueUpdate}
-                content={{data: {...json}}}
+                content={{ data: { ...json } }}
                 setContent={setJSON}
               />
             ) : (
               <Editor json={json} setJSON={setJSON} className={s.json} />
-            )}
-            {/* <Section text="json">
+            )} */}
+            <Section text="json">
               <Editor json={json} setJSON={setJSON} className={s.json} />
-            </Section> */}
+            </Section>
             <Section text="mdx">
               <MDXEditor setMDX={setMDX} className={s.mdx} />
             </Section>

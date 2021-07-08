@@ -12,7 +12,7 @@
   background: #21252b;
   grid-area: sidebar;
   display: grid;
-  grid-template-rows: min-content 38px 250px minmax(0, 1fr) 150px;
+  grid-template-rows: min-content 250px minmax(0, 1fr) 150px;
 }
 
 .json,
