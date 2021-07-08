@@ -1,0 +1,5 @@
+.preview {
+  height: 100vh;
+  overflow: scroll;
+  grid-area: preview;
+}

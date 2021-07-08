@@ -1,22 +1,11 @@
-import {useState, useEffect} from "react";
 import CodeEditor from 'react-simple-code-editor';
 import Highlight, { Prism } from 'prism-react-renderer';
 import theme from './theme';
 
-const Editor = ({ language = 'yaml', className, setPreviewData }) => {
-  const [data, setData] = useState("{}");
-
+const Editor = ({ language = 'json', className, json, setJSON }) => {
   const handleChange = (e) => {
-    setData(e);
+    setJSON(e);
   }
-
-  useEffect(() => {
-    const timeOutId = setTimeout(() => {
-      setPreviewData(data);
-      console.log('data been set');
-    }, 1000);
-    return () => clearTimeout(timeOutId);
-  }, [data]);
 
   let highlightCode = (code) => (
     <Highlight Prism={Prism} code={code} theme={theme} language={language}>
@@ -39,7 +28,7 @@ const Editor = ({ language = 'yaml', className, setPreviewData }) => {
   return (
     <CodeEditor
       className={className}
-      value={data}
+      value={json}
       padding={10}
       highlight={highlightCode}
       onValueChange={handleChange}

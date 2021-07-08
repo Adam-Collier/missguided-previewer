@@ -1,13 +1,25 @@
 /* eslint react/jsx-key: 0 */
 import React, { useEffect, useState } from 'react';
 import { LiveProvider, LiveError, LivePreview } from 'react-live';
-import { mdx } from '@mdx-js/react';
+import { mdx as mdxLib } from '@mdx-js/react';
 import * as missguidedComponents from 'missguided-components';
 import * as creativeComponents from 'vite-storybook';
-import { Container, Row, Col } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  ToggleButtonGroup,
+  ToggleButton,
+} from 'react-bootstrap';
+
 
 import { Section } from '../Section';
 import { Highlight } from '../Highlight';
+// // form
+import { ComponentForm } from '../ComponentForm';
+import ComponentLibraryDescription from 'missguided-components/dist/form/information.json';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 // editors
 import Editor from '../Editor';
 import { MDXEditor } from '../MDXEditor';
@@ -17,17 +29,73 @@ import Amplience from '../Amplience';
 
 import s from './playground.module.css';
 
+const contentChangeDebounce = new Subject();
+const valueUpdate = new Subject();
+
+contentChangeDebounce
+  .pipe(debounceTime(1000))
+  .subscribe(({ changedLayout, contentData, callback }) => {
+    Object.keys(ComponentLibraryDescription).forEach((componentKey) => {
+      let modifier = 0;
+      const pattern = `<${componentKey} (.*?)\/>`;
+      Array.from(changedLayout.matchAll(new RegExp(pattern, 'gi'))).forEach(
+        (item, index) => {
+          if (item[1].indexOf('{ ...content.') === -1) {
+            const inserString = ` { ...content.${componentKey + index}} `;
+
+            changedLayout = `${changedLayout.substring(
+              0,
+              item.index + modifier
+            )} <${componentKey}${inserString}${changedLayout.substring(
+              item.index + modifier + componentKey.length + 2
+            )}`;
+
+            modifier = modifier + inserString.length;
+            contentData[componentKey + index] = { componentType: componentKey };
+            Object.keys(ComponentLibraryDescription[componentKey]).forEach(
+              (propertyKey) => {
+                contentData[componentKey + index][propertyKey] = '';
+              }
+            );
+          }
+        }
+      );
+    });
+
+    Object.keys(contentData).forEach((contentKey) => {
+      if (changedLayout.indexOf(contentKey) === -1) {
+        delete contentData[contentKey];
+      }
+    });
+
+    callback(changedLayout, contentData);
+  });
+
+valueUpdate
+  .pipe(debounceTime(500))
+  .subscribe(
+    ({ content, setContent, componentName, descriptionKey, value }) => {
+      console.log(content);
+      content.data[componentName][descriptionKey] = value;
+      setContent({ ...content });
+    }
+  );
+
+
+
 const Playground = ({ live }) => {
   const [isSDK, setIsSDK] = useState(false);
   const [sdk, setSDK] = useState(undefined);
+  // toggle between form and json view
+  const [advancedMode, setAdvancedMode] = useState(false);
 
   // update data and layout seperately
   // join together only when sending to amplience
-  const [data, setData] = useState('{}');
-  const [layout, setLayout] = useState('');
+  const [json, setJSON] = useState('{}');
+  const [mdx, setMDX] = useState('');
 
-  const [previewLayout, setPreviewLayout] = useState('');
-  const [previewData, setPreviewData] = useState('');
+  const [previewMDX, setPreviewMDX] = useState('');
+  const [previewJSON, setPreviewJSON] = useState('');
 
   useEffect(() => {
     init()
@@ -41,8 +109,8 @@ const Playground = ({ live }) => {
           console.log('field data:', data, typeof data);
           // setContent(JSON.parse(data));
           let allData = JSON.parse(data);
-          setData(allData.data);
-          setLayout(allData.layout);
+          setJSON(allData.data);
+          setMDX(allData.layout);
         });
       })
       .catch((err) => {
@@ -50,30 +118,52 @@ const Playground = ({ live }) => {
       });
   }, []);
 
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      setPreviewJSON(json);
+      console.log('json been set');
+    }, 1000);
+    return () => clearTimeout(timeOutId);
+  }, [json]);
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      setPreviewMDX(mdx);
+      console.log('mdx been set');
+    }, 1000);
+    return () => clearTimeout(timeOutId);
+  }, [mdx]);
+
   // TODO: figure out a way to handle sdk logic
   // could pass as initial values and update state in useEffect
 
   // const handleJSON = (e) => {
-  //   setData(e);
+  //   setJSON(e);
 
   //   if (isSDK) {
   //     sdk.field.setValue(JSON.stringify({ data, layout }));
   //   }
   // };
 
+  const handleAdvancedModeChange = (value) => {
+    setAdvancedMode(value);
+  };
+
+  console.log(json);
+
   if (live) {
     return (
       <LiveProvider
-        code={previewLayout}
+        code={previewMDX}
         transformCode={(code) => '/** @jsx mdx */' + code}
         scope={{
-          mdx,
+          mdx: mdxLib,
           ...missguidedComponents,
           ...creativeComponents,
           Container,
           Col,
           Row,
-          content: previewData,
+          content: json,
         }}
       >
         <div className={s.wrapper}>
@@ -82,20 +172,42 @@ const Playground = ({ live }) => {
               <Amplience
                 isSDK={isSDK}
                 sdk={sdk}
-                data={data}
-                layout={layout}
-                setData={setData}
-                setLayout={setLayout}
+                json={json}
+                mdx={mdx}
+                setJSON={setJSON}
+                setMDX={setMDX}
               />
             </Section>
-            <Section text="json">
-              <Editor setPreviewData={setPreviewData} className={s.json} />
+            <Section>
+              <ToggleButtonGroup
+                type="radio"
+                value={advancedMode}
+                name="advancedMode"
+                onChange={handleAdvancedModeChange}
+                className="mb-4"
+              >
+                <ToggleButton name="form" value={true}>
+                  Form
+                </ToggleButton>
+                <ToggleButton name="json" value={false}>
+                  Json
+                </ToggleButton>
+              </ToggleButtonGroup>
             </Section>
+            {advancedMode ? (
+              <ComponentForm
+                valueUpdate={valueUpdate}
+                content={{data: {...json}}}
+                setContent={setJSON}
+              />
+            ) : (
+              <Editor json={json} setJSON={setJSON} className={s.json} />
+            )}
+            {/* <Section text="json">
+              <Editor json={json} setJSON={setJSON} className={s.json} />
+            </Section> */}
             <Section text="mdx">
-              <MDXEditor
-                setPreviewLayout={setPreviewLayout}
-                className={s.mdx}
-              />
+              <MDXEditor setMDX={setMDX} className={s.mdx} />
             </Section>
             <Section text="error">
               <LiveError className={s.error} />
@@ -107,7 +219,7 @@ const Playground = ({ live }) => {
     );
   }
 
-  return <Highlight code={layout} />;
+  return <Highlight code={mdx} />;
 };
 
 export { Playground };

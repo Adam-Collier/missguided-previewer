@@ -1,19 +1,9 @@
-import {useState, useEffect} from "react";
 import {LiveEditor} from "react-live";
 
-export const MDXEditor = ({setPreviewLayout, className}) => {
-    const [layout, setLayout] = useState("");
-
-    useEffect(() => {
-      const timeOutId = setTimeout(() => {
-        setPreviewLayout(layout);
-        console.log('layout been set');
-      }, 1000);
-      return () => clearTimeout(timeOutId);
-    }, [layout]);
+export const MDXEditor = ({setMDX, className}) => {
 
     const handleChange = (e) => {
-        setLayout(e);
+        setMDX(e);
     }
 
     return <LiveEditor className={className} onChange={handleChange} />;
