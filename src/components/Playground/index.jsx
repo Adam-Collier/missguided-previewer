@@ -10,19 +10,16 @@ import {
   Col,
 } from 'react-bootstrap';
 
-
 import { Section } from '../Section';
 import { Highlight } from '../Highlight';
-// editors
-import Editor from '../Editor';
+import { FormEditor } from '../FormEditor';
 import { MDXEditor } from '../MDXEditor';
 // amplience
 import { init } from 'dc-extensions-sdk';
 import Amplience from '../Amplience';
 
+import { getComponentAttributes } from '../../lib/component-attributes';
 import s from './playground.module.css';
-
-
 
 const Playground = ({ live }) => {
   const [isSDK, setIsSDK] = useState(false);
@@ -33,6 +30,8 @@ const Playground = ({ live }) => {
   // join together only when sending to amplience
   const [json, setJSON] = useState('{}');
   const [mdx, setMDX] = useState('');
+
+  const [ast, setAST] = useState({});
 
   const [previewMDX, setPreviewMDX] = useState('');
   const [previewJSON, setPreviewJSON] = useState('');
@@ -60,8 +59,11 @@ const Playground = ({ live }) => {
 
   useEffect(() => {
     const timeOutId = setTimeout(() => {
-      setPreviewJSON(json);
-      console.log('json been set');
+      try {
+        setPreviewJSON(JSON.parse(json));
+      } catch (e) {
+        // if the JSON isn't valid, do nothing
+      }
     }, 1000);
     return () => clearTimeout(timeOutId);
   }, [json]);
@@ -69,14 +71,9 @@ const Playground = ({ live }) => {
   useEffect(() => {
     const timeOutId = setTimeout(() => {
       setPreviewMDX(mdx);
-      console.log('mdx been set');
     }, 1000);
     return () => clearTimeout(timeOutId);
   }, [mdx]);
-
-  console.log(missguidedComponents, "missguided components");
-  console.log(creativeComponents["Text"].propTypes);
-
 
   if (live) {
     return (
@@ -105,11 +102,16 @@ const Playground = ({ live }) => {
                 setMDX={setMDX}
               />
             </Section>
-            <Section text="json">
-              <Editor json={json} setJSON={setJSON} className={s.json} />
+            <Section text="form">
+              <FormEditor ast={ast} setAST={setAST} components={getComponentAttributes(ast)}/>
             </Section>
             <Section text="mdx">
-              <MDXEditor setMDX={setMDX} className={s.mdx} />
+              <MDXEditor
+                ast={ast}
+                setMDX={setMDX}
+                setAST={setAST}
+                className={s.mdx}
+              />
             </Section>
             <Section text="error">
               <LiveError className={s.error} />
