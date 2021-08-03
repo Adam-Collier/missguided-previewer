@@ -1,0 +1,15 @@
+.accordion {
+  width: 100%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: #f4f4f4;
+  font-size: 0.875rem;
+  padding: 0.25rem;
+}
+
+.accordion svg {
+  margin-right: 0.25rem;
+}
