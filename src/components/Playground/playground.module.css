@@ -9,10 +9,16 @@
 .sidebar {
   width: var(--width);
   height: 100vh;
+  overflow-y: scroll;
   background: #21252b;
   grid-area: sidebar;
   display: grid;
-  grid-template-rows: min-content 250px minmax(0, 1fr) 150px;
+  grid-template-rows: min-content min-content minmax(0, 1fr);
+}
+
+.preview {
+  height: 100vh;
+  overflow-y: scroll;
 }
 
 .json,
@@ -21,8 +27,17 @@
   font-size: 0.75rem;
 }
 
+.mdxEditor {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 150px;
+}
+
 .error {
   width: var(--width);
   color: #fff;
   padding: 1rem;
+}
+
+.hidden {
+  display: none;
 }
