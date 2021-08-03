@@ -1,0 +1,15 @@
+.wrapper {
+  padding: 0.5rem;
+}
+
+.button {
+  color: #fff;
+  border: 1px solid white;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+}
+
+.active {
+  background: hsl(216, 13.2%, 20%);
+}
