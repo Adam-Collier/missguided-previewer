@@ -1,0 +1,30 @@
+.wrapper {
+  background: white;
+  align-self: stretch;
+}
+
+.content {
+  padding: 0.5rem 0.875rem 1rem;
+  background: white;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.input {
+  padding: 0.375rem 0.625rem;
+  border: none;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px inset;
+  transition: box-shadow 200ms ease-out 0s, opacity 200ms ease-out 0s;
+  border-radius: 3px;
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: rgb(30, 167, 253) 0px 0px 0px 1px inset;
+}
